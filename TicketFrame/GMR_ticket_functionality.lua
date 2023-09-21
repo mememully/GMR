@@ -10,6 +10,9 @@ function GMR.LoadTicket(id)
 		num = GMR.TicketData[id].num,
 		creator = GMR.TicketData[id].creator
 	}
+
+	GMR.Print("index "..GMR.TicketData[id].num)
+	GMR.Print("index "..GMR.TicketData[id].creator)
 	GMR.Titles["CurrentTicketNum"]:SetText("Ticket num: "..GMR.CurrentTicketInfo.num)
 	GMR.Titles["CurrentTicketCreator"]:SetText("Character:   "..GMR.CurrentTicketInfo.creator)
 	GMR.SendCommandSafe(".ticket "..GMR.TicketData[id].num, "ticket", GMR.command_handle_ticket)

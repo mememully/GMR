@@ -38,11 +38,13 @@ function GMR.command_handle_ticket(data, mess_iter, com, str, message)
 end
 
 function GMR.command_handle_ticket_list(data, mess_iter, com, str, message)
-	if data and getn(data) > 0 then
+
+	if data and getn(data) > 0 and data[1] ~= nil then
 		if mess_iter == 2 then
 			GMR.TicketData = {}
 		end
 		local num, creator, created, changed, assigned, level = data[1], data[2], data[3], data[4], data[5], data[6]
+	
 		GMR.TicketData[mess_iter - 1] = {
 			num = num,
 			creator = creator or "",
@@ -55,6 +57,35 @@ function GMR.command_handle_ticket_list(data, mess_iter, com, str, message)
 		if GMR.CheckButtons["Characters scan type"]:GetChecked() then 
 			SLib.CallStack.NewCall(GMR.ScanTicketChars, 0.5)
 		end
+	else
+	 --adding workaround code to fix china client problems.
+	    local ticket_start,ticket_end = string.find(str,"Ticket:")
+		local createor_start,creator_end = string.find(str,".Creator:")
+		local created_start,created_end = string.find(str,"Created:")
+		local ago_start,ago_end = string.find(str,"前")
+		local assign_message_start,assign_message_end = string.find(str,"给")
+		if ticket_end ~= nil then 
+			local num = string.sub(str,ticket_end+1,createor_start-1)
+      	    local creator = string.sub(str,creator_end+3,created_start-2)
+            local created = string.sub(str,created_end+1,ago_start-1)
+		    local assigned = nil
+		    if assign_message_end~=nil then
+			    assigned =string.sub(str,assign_message_end)
+		    end
+		
+		    GMR.TicketData[mess_iter - 1] = {
+		  	    num = num,
+		  	    creator = creator or "",
+		  	    created = created or "",
+		  	    changed =   "",
+		  	    assigned = assigned or "",
+		  	    level  =  "",
+		    }
+		    SLib.CallStack.NewCall(GMR.UpdateTotalTickets, 0.5)
+		    if GMR.CheckButtons["Characters scan type"]:GetChecked() then 
+			    SLib.CallStack.NewCall(GMR.ScanTicketChars, 0.5)
+	        end
+	    end
 	end
 end
 
